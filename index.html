@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OvenMark — Oven Temperature Converter: °F, °C, Gas Mark &amp; Fan</title>
+<meta name="description" content="OvenMark is a free oven temperature converter: °F to °C, gas mark to Celsius, 180°C to Fahrenheit, fan-oven offsets, descriptive oven terms and dish presets — no signup.">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .no-print {}
+  /* ---- visual oven scale slider ---- */
+  input[type=range].oven-range { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; border-radius: 9999px; outline: none;
+    background: linear-gradient(90deg,#fde68a 0%,#fed7aa 18%,#fb923c 38%,#f97316 55%,#ea580c 72%,#9a3412 88%,#7c2d12 100%);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.25); }
+  input[type=range].oven-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 34px; height: 34px; border-radius: 9999px;
+    background: #fff; border: 4px solid #92400E; box-shadow: 0 2px 10px rgba(0,0,0,.35); cursor: pointer; }
+  input[type=range].oven-range::-moz-range-thumb { width: 28px; height: 28px; border-radius: 9999px;
+    background: #fff; border: 4px solid #92400E; box-shadow: 0 2px 10px rgba(0,0,0,.35); cursor: pointer; }
+  .tick-dot { position: absolute; top: -6px; width: 10px; height: 10px; margin-left: -5px; border-radius: 9999px; background: #fff; border: 2px solid #92400E; cursor: pointer; }
+  .tick-dot:hover { transform: scale(1.35); }
+  .flame-flicker { animation: flick 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes flick { 0%,100% { transform: scale(1) rotate(-2deg);} 50% { transform: scale(1.06) rotate(2deg);} }
+  .article-body p { margin-bottom: 1.1rem; line-height: 1.75; }
+  .article-body h2 { font-size: 1.5rem; font-weight: 800; color: #92400E; margin: 2.2rem 0 1rem; }
+  .article-body h3 { font-size: 1.15rem; font-weight: 700; color: #7c2d12; margin: 1.6rem 0 .6rem; }
+  .article-body ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1.1rem; line-height: 1.75; }
+  .article-body table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .92rem; }
+  .article-body th, .article-body td { border: 1px solid #e7cda8; padding: .55rem .7rem; text-align: left; }
+  .article-body th { background: #92400E; color: #fff8f0; font-weight: 700; }
+  .article-body tr:nth-child(even) td { background: #fff3e2; }
+</style>
+</head>
+<body id="top" class="bg-[#FFF8F0] text-[#431407]">
+
+<!-- ===== STICKY HEADER ===== -->
+<header class="sticky top-0 z-40 bg-[#FFF8F0]/95 backdrop-blur border-b-2 border-[#EA580C]/30 shadow-sm">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2">
+      <svg class="w-8 h-8 flame-flicker" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2c.8 3.2-1.2 5-2.8 6.6C7.4 10.4 6 12 6 14.5A6 6 0 0 0 12 20.5a6 6 0 0 0 6-6c0-1.9-.8-3.4-1.7-4.8-.4 1-1 1.8-2 2.3.3-3.5-1-6.9-2.3-10z" fill="#EA580C"/>
+        <path d="M12 9.5c.4 1.6-.6 2.5-1.4 3.3-.9.9-1.6 1.7-1.6 3a3 3 0 0 0 6 0c0-.9-.4-1.7-.8-2.4-.2.5-.5.9-1 1.1.2-1.7-.4-3.4-1.2-5z" fill="#FDBA74"/>
+      </svg>
+      <span class="text-2xl font-black tracking-tight text-[#92400E]">Oven<span class="text-[#EA580C]">Mark</span></span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm sm:text-base font-semibold">
+      <a href="#top" class="text-[#92400E] hover:text-[#EA580C] transition-colors">Home</a>
+      <a href="https://fixoraa.tech" class="text-[#92400E] hover:text-[#EA580C] transition-colors">More Tools</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="mx-auto max-w-6xl px-4 sm:px-6 pt-8 pb-2 text-center">
+  <span class="inline-flex items-center gap-1.5 bg-[#EA580C] text-white text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full shadow-md">
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Unlimited Free Usage
+  </span>
+  <h1 class="mt-4 text-3xl sm:text-5xl font-black text-[#92400E] leading-tight">Oven Temperature Converter</h1>
+  <p class="mt-3 text-base sm:text-lg text-[#7c2d12]/80 max-w-2xl mx-auto">Drag the dial, type a number, or pick a dish — get °F, °C, Gas Mark, fan-assisted °C and plain-English oven terms instantly.</p>
+</section>
+
+<!-- ===== VISUAL SCALE SLIDER HERO ===== -->
+<section class="mx-auto max-w-6xl px-4 sm:px-6 mt-6">
+  <div class="bg-white rounded-3xl shadow-xl border-2 border-[#EA580C]/25 p-5 sm:p-8">
+    <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-[#92400E]">🔥 Visual Oven Scale</h2>
+      <span class="text-xs sm:text-sm text-[#7c2d12]/70 font-medium">90°C – 260°C · drag the flame dial</span>
+    </div>
+
+    <div class="relative px-1 pt-6 pb-2">
+      <div id="tickRow" class="relative h-0"></div>
+      <input id="ovenSlider" type="range" min="90" max="260" step="5" value="180" class="oven-range" aria-label="Oven temperature in Celsius">
+      <div class="flex justify-between text-xs font-bold text-[#92400E] mt-2">
+        <span>90°C<br><span class="font-medium text-[#7c2d12]/70">195°F</span></span>
+        <span class="text-center">140°C · Gas 1<br><span class="font-medium text-[#7c2d12]/70">275°F</span></span>
+        <span class="text-center">180°C · Gas 4<br><span class="font-medium text-[#7c2d12]/70">350°F</span></span>
+        <span class="text-center">220°C · Gas 7<br><span class="font-medium text-[#7c2d12]/70">425°F</span></span>
+        <span class="text-right">260°C<br><span class="font-medium text-[#7c2d12]/70">500°F</span></span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-5">
+      <div class="bg-[#FFF8F0] rounded-2xl border border-[#EA580C]/30 p-3 text-center">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Celsius</div>
+        <div id="rC" class="text-2xl font-black text-[#EA580C]">180°C</div>
+      </div>
+      <div class="bg-[#FFF8F0] rounded-2xl border border-[#EA580C]/30 p-3 text-center">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Fahrenheit</div>
+        <div id="rF" class="text-2xl font-black text-[#EA580C]">350°F</div>
+      </div>
+      <div class="bg-[#FFF8F0] rounded-2xl border border-[#EA580C]/30 p-3 text-center">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Gas Mark</div>
+        <div id="rGM" class="text-2xl font-black text-[#EA580C]">4</div>
+      </div>
+      <div class="bg-[#FFF8F0] rounded-2xl border border-[#EA580C]/30 p-3 text-center">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Fan-assisted</div>
+        <div id="rFan" class="text-2xl font-black text-[#EA580C]">160°C</div>
+      </div>
+      <div class="bg-[#92400E] rounded-2xl p-3 text-center col-span-2 sm:col-span-1">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-[#FDBA74]">Oven speak</div>
+        <div id="rDesc" class="text-xl font-black text-white">Moderate</div>
+      </div>
+    </div>
+    <p class="mt-3 text-xs text-[#7c2d12]/70 text-center">Fan-assisted = conventional °C − 20°C. Tip: click any white dot above the slider to jump to that gas mark.</p>
+  </div>
+</section>
+
+<!-- TOP AD (verbatim) -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONVERTER TOOL ===== -->
+<main class="mx-auto max-w-6xl px-4 sm:px-6 mt-8">
+  <div class="bg-white rounded-3xl shadow-xl border-2 border-[#92400E]/20 overflow-hidden">
+    <div class="bg-gradient-to-r from-[#92400E] via-[#b45309] to-[#EA580C] px-6 py-5">
+      <h2 class="text-2xl sm:text-3xl font-black text-white">Convert Any Oven Temperature</h2>
+      <p class="text-[#FDE68A] text-sm sm:text-base mt-1">Bidirectional: type a value in any scale and see all the others — fan offset applied automatically.</p>
+    </div>
+
+    <div class="p-5 sm:p-8">
+      <div class="flex flex-col sm:flex-row gap-4 items-stretch">
+        <div class="flex-1">
+          <label for="tempInput" class="block text-sm font-bold text-[#92400E] mb-1.5">Temperature value</label>
+          <input id="tempInput" type="text" inputmode="decimal" placeholder="e.g. 180" value="180"
+            class="w-full text-2xl font-bold px-4 py-3 rounded-xl border-2 border-[#EA580C]/40 bg-[#FFF8F0] focus:border-[#EA580C] focus:ring-2 focus:ring-[#EA580C]/30 outline-none text-[#431407]">
+        </div>
+        <div class="sm:w-64">
+          <label for="unitSelect" class="block text-sm font-bold text-[#92400E] mb-1.5">This value is in…</label>
+          <select id="unitSelect"
+            class="w-full text-lg font-bold px-4 py-3 rounded-xl border-2 border-[#EA580C]/40 bg-[#FFF8F0] focus:border-[#EA580C] outline-none text-[#431407]">
+            <option value="C" selected>°C — Celsius</option>
+            <option value="F">°F — Fahrenheit</option>
+            <option value="GM">Gas Mark</option>
+            <option value="FAN">°C — Fan-assisted</option>
+          </select>
+        </div>
+        <div id="gasMarkPickerWrap" class="sm:w-64 hidden">
+          <label for="gasMarkPicker" class="block text-sm font-bold text-[#92400E] mb-1.5">Choose gas mark</label>
+          <select id="gasMarkPicker"
+            class="w-full text-lg font-bold px-4 py-3 rounded-xl border-2 border-[#EA580C]/40 bg-[#FFF8F0] focus:border-[#EA580C] outline-none text-[#431407]">
+            <option value="¼">Gas Mark ¼</option><option value="½">Gas Mark ½</option>
+            <option value="1">Gas Mark 1</option><option value="2">Gas Mark 2</option><option value="3">Gas Mark 3</option>
+            <option value="4" selected>Gas Mark 4</option><option value="5">Gas Mark 5</option><option value="6">Gas Mark 6</option>
+            <option value="7">Gas Mark 7</option><option value="8">Gas Mark 8</option><option value="9">Gas Mark 9</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="convError" class="hidden mt-3 text-sm font-bold text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5"></p>
+      <p id="convWarn" class="hidden mt-3 text-sm font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5"></p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+        <div class="rounded-2xl bg-[#FFF8F0] border-2 border-[#EA580C]/30 p-4 text-center">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Celsius</div>
+          <div id="cC" class="text-3xl font-black text-[#92400E]">180°C</div>
+        </div>
+        <div class="rounded-2xl bg-[#FFF8F0] border-2 border-[#EA580C]/30 p-4 text-center">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Fahrenheit</div>
+          <div id="cF" class="text-3xl font-black text-[#92400E]">350°F</div>
+        </div>
+        <div class="rounded-2xl bg-[#FFF8F0] border-2 border-[#EA580C]/30 p-4 text-center">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#7c2d12]/60">Gas Mark</div>
+          <div id="cGM" class="text-3xl font-black text-[#92400E]">4</div>
+        </div>
+        <div class="rounded-2xl bg-[#92400E] p-4 text-center">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-[#FDBA74]">Fan-assisted °C</div>
+          <div id="cFan" class="text-3xl font-black text-white">160°C</div>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 bg-[#FFF3E2] border border-[#EA580C]/30 rounded-2xl px-5 py-3">
+        <p class="text-sm text-[#7c2d12]"><strong class="text-[#92400E]">Fan offset applied:</strong> fan-assisted °C = conventional °C − 20°C (standard convection convention).</p>
+        <p class="text-sm font-bold text-[#92400E]">Oven speak: <span id="cDesc" class="text-[#EA580C]">Moderate</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GAS MARK QUICK PICK ===== -->
+  <div class="mt-8 bg-white rounded-3xl shadow-lg border-2 border-[#EA580C]/25 p-5 sm:p-7">
+    <h2 class="text-xl sm:text-2xl font-extrabold text-[#92400E]">Gas Mark → °C / °F</h2>
+    <p class="text-sm text-[#7c2d12]/75 mt-1 mb-4">Tap a gas mark to see its full oven setting. Standard UK gas-mark table.</p>
+    <div id="gasPills" class="flex flex-wrap gap-2.5"></div>
+    <div id="gasDetail" class="mt-4 hidden rounded-2xl bg-[#FFF8F0] border-2 border-[#92400E]/25 px-5 py-4">
+      <p class="text-lg font-bold text-[#92400E]"><span id="gasDetailTitle">Gas Mark 4</span></p>
+      <p id="gasDetailBody" class="text-[#7c2d12] mt-1"></p>
+    </div>
+  </div>
+
+  <!-- ===== DESCRIBE MY OVEN ===== -->
+  <div class="mt-8 bg-gradient-to-br from-[#92400E] to-[#7c2d12] rounded-3xl shadow-lg p-5 sm:p-7 text-white">
+    <h2 class="text-xl sm:text-2xl font-extrabold">🗣️ Describe My Oven — Term Lookup</h2>
+    <p class="text-sm text-[#FDE68A]/90 mt-1 mb-4">Old recipes say “bake in a moderate oven” or “very hot oven”. Pick the term — we’ll give you the exact setting in every scale.</p>
+    <div id="descPills" class="flex flex-wrap gap-2.5"></div>
+    <div id="descDetail" class="mt-4 hidden rounded-2xl bg-white/10 border border-white/25 px-5 py-4">
+      <p class="text-lg font-black"><span id="descDetailTitle">Moderate</span> <span class="text-[#FDBA74] font-bold text-base">oven means…</span></p>
+      <p id="descDetailBody" class="mt-1 text-[#FFF8F0]"></p>
+    </div>
+  </div>
+
+  <!-- ===== DISH PRESETS ===== -->
+  <div class="mt-8">
+    <h2 class="text-xl sm:text-2xl font-extrabold text-[#92400E] px-1">🍕 Dish Presets — What temperature for…?</h2>
+    <p class="text-sm text-[#7c2d12]/75 mt-1 mb-4 px-1">Tap a dish to load its classic oven setting into the converter and the visual scale above.</p>
+    <div id="presetGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
+  </div>
+</main>
+
+<!-- BOTTOM AD (verbatim) -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4 mt-10" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEO ARTICLE ===== -->
+<section class="mx-auto max-w-4xl px-4 sm:px-6 mt-12 mb-4">
+<article id="seo-article" class="article-body text-[#431407]/90">
+<h2>The Complete Guide to Oven Temperatures: °C, °F, Gas Mark, Fan &amp; Oven Speak</h2>
+<p>Every cook, sooner or later, stands in front of a recipe that speaks a different oven language. An American baking blog calls for 350°F. A British grandmother’s handwritten cake recipe says Gas Mark 4. Your own oven — a modern fan-assisted model — only shows Celsius. And then there’s the vintage cookbook that simply instructs you to bake “in a moderate oven” and leaves the rest to faith. An oven temperature converter exists to end this confusion in seconds, but understanding what the numbers actually mean will make you a calmer, more confident cook. This guide walks through every oven scale in use around the world, how they relate to each other, and how to use them in a real kitchen.</p>
+
+<h2>The Five Oven Scales You Will Meet</h2>
+<p>There are five ways a recipe can express oven heat, and all of them appear in this converter. <strong>Celsius (°C)</strong> is the standard in most of the world — Europe, Asia, Australia, and increasingly the UK — and the scale nearly every modern oven dial uses. <strong>Fahrenheit (°F)</strong> remains the default in the United States, and in American recipes it is still the only temperature you will ever see. <strong>Gas Mark</strong> is the old British system for gas ovens, numbered from ¼ up to 9, and it survives because millions of UK kitchens still cook with gas and because classic British recipes were written in it. <strong>Fan-assisted (convection) Celsius</strong> is the setting you use on a fan oven, where a fan circulates hot air and food cooks faster and more evenly than in a conventional static oven. Finally there are the <strong>descriptive terms</strong> — very slow, slow, moderate, hot, very hot — the oldest system of all, from the era before thermostats, when a cook judged heat by holding a hand in the oven.</p>
+<p>The converter above translates freely between all five. Type 180 into the Celsius box and you instantly learn that it is 350°F, Gas Mark 4, 160°C in a fan oven, and a “moderate” oven. Drag the visual slider and every scale follows. That is the entire job of an oven temperature converter: one input, every answer, no mental arithmetic with a cake in the oven and flour on your hands.</p>
+
+<h2>Gas Mark to Celsius: The Full Chart</h2>
+<p>The gas mark system was standardised in the United Kingdom for gas ovens, and its quirk is that the steps are not even — the gaps between marks widen as the oven gets hotter. The universally used table, the same one baked into this converter, is:</p>
+<table>
+<thead><tr><th>Gas Mark</th><th>°C (conventional)</th><th>°F</th><th>°C (fan-assisted)</th></tr></thead>
+<tbody>
+<tr><td>¼</td><td>110</td><td>225</td><td>90</td></tr>
+<tr><td>½</td><td>120</td><td>250</td><td>100</td></tr>
+<tr><td>1</td><td>140</td><td>275</td><td>120</td></tr>
+<tr><td>2</td><td>150</td><td>300</td><td>130</td></tr>
+<tr><td>3</td><td>170</td><td>325</td><td>150</td></tr>
+<tr><td>4</td><td>180</td><td>350</td><td>160</td></tr>
+<tr><td>5</td><td>190</td><td>375</td><td>170</td></tr>
+<tr><td>6</td><td>200</td><td>400</td><td>180</td></tr>
+<tr><td>7</td><td>220</td><td>425</td><td>200</td></tr>
+<tr><td>8</td><td>230</td><td>450</td><td>210</td></tr>
+<tr><td>9</td><td>240</td><td>475</td><td>220</td></tr>
+</tbody>
+</table>
+<p>Notice that 140°C is listed as 275°F even though 140°C converts mathematically to 284°F. Oven charts are practical approximations, not physics-lab values — thermostats are not that precise anyway, so charts round to the nearest familiar dial setting. When this converter matches a Celsius value to a gas mark, it picks the nearest mark on this standard table, which is exactly what the printed charts on the inside of British oven doors do.</p>
+
+<h2>The Conversions Everyone Searches For</h2>
+<h3>180°C to Fahrenheit in an oven</h3>
+<p>180°C is 350°F — more precisely 356°F by strict arithmetic, but every oven chart in existence rounds it to 350°F, which is the number on American dials. This is the single most-searched oven conversion in the world because 180°C (Gas Mark 4) is the default baking temperature for cakes, cookies, and casseroles across the UK, Europe and Australia, while 350°F is the default baking temperature across the United States. If you remember only one pair, remember this one: 180°C = 350°F = Gas Mark 4.</p>
+<h3>350°F to Celsius for an oven</h3>
+<p>Going the other direction, 350°F converts to 176.7°C, which oven charts round to 175°C or 180°C. In practice, set your Celsius oven to 180°C (or 160°C fan) and you will get identical results to an American recipe’s 350°F. The small rounding difference is far smaller than the natural swing of a home oven’s thermostat, which routinely cycles 10–15°C above and below the set point.</p>
+<h3>Gas Mark 4 in Celsius</h3>
+<p>Gas Mark 4 is 180°C conventional, 350°F, and 160°C in a fan oven — the “moderate” oven of classic recipes. It is the workhorse setting: sponge cakes, victoria sandwiches, roast chicken joints, lasagne, and most biscuits all live at Gas Mark 4. If a British recipe gives no temperature at all but says “moderate oven”, Gas Mark 4 is the safe assumption.</p>
+<p>Other pairs worth memorising: 200°C = 400°F = Gas Mark 6 (roasting vegetables, pizza bases in a home oven’s upper range); 220°C = 425°F = Gas Mark 7 (crusty bread, roast potatoes); 150°C = 300°F = Gas Mark 2 (slow braises, meringues at the low end); and 240°C = 475°F = Gas Mark 9 (the “as hot as it goes” setting for thin-crust pizza and searing).</p>
+
+<h2>Fan-Assisted Ovens: The −20°C Rule</h2>
+<p>A fan (convection) oven circulates hot air with a fan at the back of the cavity. Because the moving air strips away the cool boundary layer around food, heat transfers faster and the whole cavity stays at a much more even temperature — no more burnt tray edges with a raw middle. The universal convention, used by manufacturers and recipe writers alike, is to <strong>reduce the conventional temperature by 20°C</strong> for a fan oven. So a cake recipe written for 180°C conventional becomes 160°C fan; a 200°C roast becomes 180°C fan.</p>
+<p>This converter applies the −20°C rule automatically and shows it explicitly, so you always know where the number came from. A few practical notes: the rule is a starting convention, not a law — very sugary bakes can still brown too fast in a fan oven, so check five minutes early the first time you convert a recipe. Food also tends to cook 10–25% faster with the fan on, so start checking doneness earlier than the recipe says. And if your oven has both settings, use conventional (static) heat for delicate custards and tall cakes where a fierce circulating blast can set the outside before the inside has risen — then switch to fan for roasts, traybakes and anything where even browning is the goal.</p>
+
+<h2>Descriptive Oven Terms, Decoded</h2>
+<p>Before thermostats, recipes described heat in words, and those words are still standardised enough to convert. The generally accepted mapping, which this converter’s “Describe My Oven” lookup uses, is: <strong>very slow</strong> — 140°C / 275°F / Gas 1 (meringues, slow drying); <strong>slow</strong> — 150°C / 300°F / Gas 2 (rich fruit cakes, braises); <strong>moderately slow</strong> — 170°C / 325°F / Gas 3 (shortbread, gentle baking); <strong>moderate</strong> — 180°C / 350°F / Gas 4 (the everyday baking default); <strong>moderately hot</strong> — 200°C / 400°F / Gas 6 (roasts, puff pastry); <strong>hot</strong> — 220°C / 425°F / Gas 7 (bread, roast potatoes); <strong>very hot</strong> — 240°C / 475°F / Gas 9 (pizza, flatbreads). If a recipe says “hot oven” without a number, Gas Mark 7 is the conventional interpretation, and “slow oven” means Gas Mark 2.</p>
+
+<h2>Dish-by-Dish: Where Each Classic Lives</h2>
+<p>Certain dishes cluster around certain temperatures for good physical reasons, and the preset buttons above encode the classics. <strong>Sponge and layer cakes</strong> bake at 180°C / 350°F / Gas 4 / 160°C fan: hot enough to set the crumb and brown the top, gentle enough that the centre cooks before the outside overbrowns. <strong>Crusty bread loaves</strong> want 220°C / 425°F / Gas 7 / 200°C fan, ideally with steam for the first ten minutes, because a fierce initial heat gives maximum oven spring before the crust sets. <strong>Roast chicken</strong> sits at 200°C / 400°F / Gas 6 / 180°C fan, the sweet spot where the skin renders crisp while the breast stays juicy — always verify with a thermometer (74°C / 165°F at the thickest part of the thigh). <strong>Thin-crust pizza</strong> wants everything your home oven has, typically 240–250°C / 475°F+ / Gas 9, on a preheated stone or steel. <strong>Chocolate chip cookies</strong> bake at 175–180°C / 350°F / Gas 4: hot enough for crisp edges, brief enough (10–12 minutes) to keep molten centres. <strong>Roast beef</strong> traditionally starts hot (220°C) for twenty minutes to brown, then drops to 180°C / Gas 4 for the remainder. <strong>Lasagne</strong> bakes at 190°C / 375°F / Gas 5 / 170°C fan until bubbling. And <strong>meringues</strong> need a very slow 120°C / 250°F / Gas ½ / 100°C fan for over an hour — they are drying, not baking.</p>
+
+<h2>Why Your Oven Lies (and What to Do About It)</h2>
+<p>Home ovens are routinely 10–25°C off the dial setting, and the dial measures one spot — usually near the thermostat — while your food sits somewhere else entirely. Hot spots near the walls and cool zones near the door are normal. The single best investment for any cook is a cheap standalone oven thermometer hung from the middle rack: check it after a full twenty-minute preheat and you will know your oven’s true offset. If it reads 165°C when the dial says 180°C, simply set 195°C from now on and stop guessing. Always preheat fully — putting food into a still-climbing oven throws off every timing in the recipe. Learn your hot spots by toasting a tray of bread slices and seeing which brown first; rotate trays halfway through baking. And remember that altitude, a dark versus shiny pan, and how full the oven is all shift results by a few degrees, which is why experienced cooks trust look, smell and thermometers over the dial.</p>
+
+<h2>A Short History of Gas Marks</h2>
+<p>The gas mark scale dates to early-20th-century Britain, when gas ovens were regulated by numbered taps rather than thermostats. It was formalised by the industry so that recipes could give repeatable instructions across different manufacturers’ ovens. The numbers run from ¼ to 9 because that matched the useful range of a domestic gas oven’s control. As electric ovens took over and Celsius became the kitchen standard in the UK, gas marks survived through sheer recipe inertia — millions of beloved recipes, from scones to Sunday roasts, were written in them. American recipes never adopted the system, which is why the °F↔Gas Mark conversion is one of the most common cross-Atlantic kitchen questions. Today the marks remain printed inside many UK oven doors, a small piece of culinary heritage that still earns its keep.</p>
+
+<h2>Using This Converter in a Real Kitchen</h2>
+<p>Three workflows cover nearly everything. <strong>Converting a recipe:</strong> type the number, set the scale the recipe uses, and read off your oven’s scale — the fan offset is applied automatically. <strong>Decoding words:</strong> use “Describe My Oven” when a recipe says “moderate” or “very hot”. <strong>Exploring:</strong> drag the visual slider to build intuition for how the scales move together — after a few minutes of play, pairs like 180°C/350°F/Gas 4 will be muscle memory. Your last setting is remembered on the device, so the converter reopens where you left it. Everything runs entirely in your browser: no account, no tracking, no waiting — just temperatures, instantly, forever free.</p>
+</article>
+
+<!-- ===== FAQs ===== -->
+<div class="mt-12">
+  <h2 class="text-2xl sm:text-3xl font-black text-[#92400E] mb-5">Frequently Asked Questions</h2>
+  <div class="space-y-3">
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">What is Gas Mark 4 in Celsius?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">Gas Mark 4 is 180°C in a conventional oven, 350°F, and 160°C in a fan-assisted oven. It is the classic “moderate” oven used for sponge cakes, roast chicken, lasagne and most everyday baking.</p>
+    </details>
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">How do I convert 180°C to Fahrenheit for an oven?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">180°C converts to 350°F on every standard oven chart (strict arithmetic gives 356°F, but ovens and recipes universally round to 350°F). In a fan oven, use 160°C. This is the most common oven conversion in the world.</p>
+    </details>
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">What is 350°F in Celsius for an oven?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">350°F is 176.7°C, which oven charts round to 175°C or 180°C. Set a Celsius oven to 180°C (160°C fan) to match an American recipe’s 350°F — the difference is smaller than a normal thermostat swing.</p>
+    </details>
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">What is the fan oven equivalent of 200°C?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">The fan oven equivalent of 200°C conventional is 180°C fan, following the standard −20°C convection rule. Also reduce expected cooking time by roughly 10–25% and check doneness early the first time you convert a recipe.</p>
+    </details>
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">What does Gas Mark mean and who uses it?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">Gas Mark is the traditional British scale for gas ovens, numbered ¼ to 9, standardised in the early 20th century. It is still used across the UK in classic recipes and printed inside many oven doors, even though modern ovens show Celsius.</p>
+    </details>
+    <details class="bg-white rounded-2xl border-2 border-[#EA580C]/25 px-5 py-4 shadow-sm">
+      <summary class="font-bold text-[#92400E] cursor-pointer text-base sm:text-lg">Why does my oven run hotter or colder than the dial says?</summary>
+      <p class="mt-2 text-[#431407]/85 leading-relaxed">Home ovens are commonly 10–25°C off the dial, with hot spots near walls and cool zones near the door. Hang an inexpensive oven thermometer on the middle rack, preheat a full 20 minutes, and adjust your set temperature by the measured offset.</p>
+    </details>
+  </div>
+</div>
+</section>
+
+<!-- ===== JSON-LD FAQPage ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is Gas Mark 4 in Celsius?", "acceptedAnswer": { "@type": "Answer", "text": "Gas Mark 4 is 180°C in a conventional oven, 350°F, and 160°C in a fan-assisted oven. It is the classic moderate oven used for sponge cakes, roast chicken, lasagne and most everyday baking." } },
+    { "@type": "Question", "name": "How do I convert 180°C to Fahrenheit for an oven?", "acceptedAnswer": { "@type": "Answer", "text": "180°C converts to 350°F on every standard oven chart (strict arithmetic gives 356°F, but ovens and recipes universally round to 350°F). In a fan oven, use 160°C." } },
+    { "@type": "Question", "name": "What is 350°F in Celsius for an oven?", "acceptedAnswer": { "@type": "Answer", "text": "350°F is 176.7°C, which oven charts round to 175°C or 180°C. Set a Celsius oven to 180°C (160°C fan) to match an American recipe's 350°F." } },
+    { "@type": "Question", "name": "What is the fan oven equivalent of 200°C?", "acceptedAnswer": { "@type": "Answer", "text": "The fan oven equivalent of 200°C conventional is 180°C fan, following the standard −20°C convection rule. Also reduce expected cooking time by roughly 10–25%." } },
+    { "@type": "Question", "name": "What does Gas Mark mean and who uses it?", "acceptedAnswer": { "@type": "Answer", "text": "Gas Mark is the traditional British scale for gas ovens, numbered ¼ to 9, standardised in the early 20th century. It is still used across the UK in classic recipes and printed inside many oven doors." } },
+    { "@type": "Question", "name": "Why does my oven run hotter or colder than the dial says?", "acceptedAnswer": { "@type": "Answer", "text": "Home ovens are commonly 10–25°C off the dial, with hot spots near walls and cool zones near the door. Use an oven thermometer on the middle rack after a full 20-minute preheat and adjust by the measured offset." } }
+  ]
+}
+</script>
+
+<!-- ===== FOOTER ===== -->
+<footer class="mt-14 border-t-2 border-[#EA580C]/25 bg-[#fffdf9]">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <p class="font-black text-[#92400E]">Oven<span class="text-[#EA580C]">Mark</span> <span class="font-medium text-[#7c2d12]/70">— free oven temperature converter</span></p>
+    <nav class="flex gap-5 text-sm font-semibold text-[#92400E]">
+      <a href="#top" class="hover:text-[#EA580C]">Home</a>
+      <a href="https://fixoraa.tech" class="hover:text-[#EA580C]">More Tools</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ===== PURE LOGIC (no DOM) — tested by node ===== -->
+<script id="ovenmark-logic">
+var FAN_OFFSET = 20;
+var MIN_C = 90;
+var MAX_C = 260;
+
+var GAS_TABLE = [
+  { gm: '¼', c: 110, f: 225 },
+  { gm: '½', c: 120, f: 250 },
+  { gm: '1', c: 140, f: 275 },
+  { gm: '2', c: 150, f: 300 },
+  { gm: '3', c: 170, f: 325 },
+  { gm: '4', c: 180, f: 350 },
+  { gm: '5', c: 190, f: 375 },
+  { gm: '6', c: 200, f: 400 },
+  { gm: '7', c: 220, f: 425 },
+  { gm: '8', c: 230, f: 450 },
+  { gm: '9', c: 240, f: 475 }
+];
+
+var DESC_TABLE = [
+  { term: 'Very slow',      c: 140 },
+  { term: 'Slow',           c: 150 },
+  { term: 'Moderately slow', c: 170 },
+  { term: 'Moderate',       c: 180 },
+  { term: 'Moderately hot', c: 200 },
+  { term: 'Hot',            c: 220 },
+  { term: 'Very hot',       c: 240 }
+];
+
+var PRESETS = [
+  { name: 'Sponge Cake',           emoji: '🍰', c: 180, tip: 'The everyday baking default — sets crumb without overbrowning.' },
+  { name: 'Crusty Bread Loaf',     emoji: '🍞', c: 220, tip: 'Fierce heat for maximum oven spring; add steam for 10 min.' },
+  { name: 'Roast Chicken',         emoji: '🍗', c: 200, tip: 'Crisp skin, juicy breast. Verify 74°C / 165°F in the thigh.' },
+  { name: 'Thin-Crust Pizza',      emoji: '🍕', c: 250, tip: 'As hot as a home oven goes — preheat a stone or steel.' },
+  { name: 'Choc-Chip Cookies',     emoji: '🍪', c: 175, tip: 'Crisp edges, molten centres. Bake 10–12 minutes.' },
+  { name: 'Roast Beef',            emoji: '🥩', c: 180, tip: 'Start at 220°C for 20 min to brown, then drop here.' },
+  { name: 'Lasagne',               emoji: '🧀', c: 190, tip: 'Bake until bubbling and golden on top.' },
+  { name: 'Meringues',             emoji: '☁️', c: 120, tip: 'Drying, not baking — 60–90 minutes until crisp.' }
+];
+
+function cToF(c) { return c * 9 / 5 + 32; }
+function fToC(f) { return (f - 32) * 5 / 9; }
+function fanFromC(c) { return c - FAN_OFFSET; }
+function round1(n) { return Math.round(n * 10) / 10; }
+
+function nearestGasMark(c) {
+  var best = GAS_TABLE[0], bd = Math.abs(c - best.c);
+  for (var i = 1; i < GAS_TABLE.length; i++) {
+    var d = Math.abs(c - GAS_TABLE[i].c);
+    if (d < bd) { bd = d; best = GAS_TABLE[i]; }
+  }
+  return best;
+}
+
+function descForC(c) {
+  var best = DESC_TABLE[0], bd = Math.abs(c - best.c);
+  for (var i = 1; i < DESC_TABLE.length; i++) {
+    var d = Math.abs(c - DESC_TABLE[i].c);
+    if (d < bd) { bd = d; best = DESC_TABLE[i]; }
+  }
+  return best.term;
+}
+
+function parseGasMark(v) {
+  var s = String(v).trim();
+  if (s === '¼' || s === '1/4') return '¼';
+  if (s === '½' || s === '1/2') return '½';
+  var n = parseFloat(s);
+  if (!isFinite(n)) return null;
+  if (n >= 1 && n <= 9 && n === Math.floor(n)) return String(n);
+  return null;
+}
+
+function gasMarkToAll(gm) {
+  var g = parseGasMark(gm);
+  if (g === null) return null;
+  for (var i = 0; i < GAS_TABLE.length; i++) {
+    if (GAS_TABLE[i].gm === g) {
+      var e = GAS_TABLE[i];
+      return { gm: e.gm, c: e.c, f: e.f, fanC: e.c - FAN_OFFSET, desc: descForC(e.c) };
+    }
+  }
+  return null;
+}
+
+function allFromC(c) {
+  var gm = nearestGasMark(c);
+  return { c: round1(c), f: round1(cToF(c)), fanC: round1(fanFromC(c)), gm: gm.gm, desc: descForC(c) };
+}
+
+/* Bidirectional conversion. unit: 'C' | 'F' | 'GM' | 'FAN' */
+function convertTemp(value, unit) {
+  unit = String(unit || 'C').toUpperCase();
+  if (unit === 'GM') {
+    var g = gasMarkToAll(value);
+    if (!g) return { error: 'Pick a valid gas mark (¼, ½, or 1–9).' };
+    g.inputUnit = 'GM'; g.outOfRange = false;
+    return g;
+  }
+  if (String(value).trim() === '') return { error: 'Enter a temperature to convert.' };
+  var v = parseFloat(value);
+  if (!isFinite(v)) return { error: 'That doesn’t look like a number — try e.g. 180.' };
+  var c = (unit === 'F') ? fToC(v) : (unit === 'FAN') ? v + FAN_OFFSET : v;
+  var out = allFromC(c);
+  out.inputUnit = unit;
+  out.outOfRange = c < MIN_C || c > MAX_C;
+  return out;
+}
+
+/* "Describe my oven" lookup: term -> recommended setting in all scales */
+function descLookup(term) {
+  var t = String(term || '').trim().toLowerCase();
+  for (var i = 0; i < DESC_TABLE.length; i++) {
+    if (DESC_TABLE[i].term.toLowerCase() === t) {
+      var d = DESC_TABLE[i];
+      var gm = nearestGasMark(d.c);
+      return { term: d.term, c: d.c, f: gm.f, fanC: d.c - FAN_OFFSET, gm: gm.gm };
+    }
+  }
+  return null;
+}
+
+function presetByName(name) {
+  var t = String(name || '').trim().toLowerCase();
+  for (var i = 0; i < PRESETS.length; i++) {
+    if (PRESETS[i].name.toLowerCase() === t) return PRESETS[i];
+  }
+  return null;
+}
+
+function presetToAll(name) {
+  var p = presetByName(name);
+  if (!p) return null;
+  var all = allFromC(p.c);
+  all.name = p.name; all.tip = p.tip;
+  return all;
+}
+</script>
+
+<!-- ===== APP (DOM wiring) ===== -->
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var slider = $('ovenSlider'), tempInput = $('tempInput'), unitSelect = $('unitSelect'),
+      gmWrap = $('gasMarkPickerWrap'), gmPicker = $('gasMarkPicker');
+
+  function fmtC(v) { return (Math.round(v * 10) / 10) + '°C'; }
+  function fmtF(v) { return Math.round(v) + '°F'; }
+
+  /* ---- slider ticks for gas marks ---- */
+  var tickRow = $('tickRow');
+  GAS_TABLE.forEach(function (e) {
+    var pct = ((e.c - MIN_C) / (MAX_C - MIN_C)) * 100;
+    var dot = document.createElement('button');
+    dot.className = 'tick-dot';
+    dot.style.left = pct + '%';
+    dot.title = 'Gas Mark ' + e.gm + ' — ' + e.c + '°C';
+    dot.setAttribute('aria-label', 'Jump to Gas Mark ' + e.gm);
+    dot.addEventListener('click', function () { setC(e.c, 'slider'); });
+    tickRow.appendChild(dot);
+    var lab = document.createElement('span');
+    lab.className = 'absolute hidden md:block text-[10px] font-bold text-[#92400E] -translate-x-1/2 whitespace-nowrap';
+    lab.style.left = pct + '%'; lab.style.top = '-24px';
+    lab.textContent = e.gm;
+    tickRow.appendChild(lab);
+  });
+
+  function paintReadout(c) {
+    var r = allFromC(c);
+    $('rC').textContent = fmtC(r.c);
+    $('rF').textContent = fmtF(r.f);
+    $('rGM').textContent = r.gm;
+    $('rFan').textContent = fmtC(r.fanC);
+    $('rDesc').textContent = r.desc;
+  }
+
+  function showResult(res) {
+    var err = $('convError'), warn = $('convWarn');
+    if (res.error) {
+      err.textContent = res.error; err.classList.remove('hidden'); warn.classList.add('hidden');
+      return;
+    }
+    err.classList.add('hidden');
+    $('cC').textContent = fmtC(res.c);
+    $('cF').textContent = fmtF(res.f);
+    $('cGM').textContent = res.gm;
+    $('cFan').textContent = fmtC(res.fanC);
+    $('cDesc').textContent = res.desc;
+    if (res.outOfRange) {
+      warn.textContent = 'Heads up: ' + fmtC(res.c) + ' is outside the typical home-oven range (90–260°C). Conversion is still shown.';
+      warn.classList.remove('hidden');
+    } else warn.classList.add('hidden');
+  }
+
+  function currentInput() {
+    var unit = unitSelect.value;
+    gmWrap.classList.toggle('hidden', unit !== 'GM');
+    tempInput.disabled = (unit === 'GM');
+    tempInput.classList.toggle('opacity-40', unit === 'GM');
+    return unit === 'GM' ? { value: gmPicker.value, unit: 'GM' } : { value: tempInput.value, unit: unit };
+  }
+
+  function runConverter() {
+    var inp = currentInput();
+    var res = convertTemp(inp.value, inp.unit);
+    showResult(res);
+    if (!res.error) {
+      var sliderC = Math.min(MAX_C, Math.max(MIN_C, Math.round(res.c / 5) * 5));
+      slider.value = sliderC;
+      paintReadout(sliderC);
+      saveState(inp.value, inp.unit);
+    }
+  }
+
+  function setC(c, source) {
+    var rounded = Math.min(MAX_C, Math.max(MIN_C, Math.round(c / 5) * 5));
+    slider.value = rounded;
+    paintReadout(rounded);
+    tempInput.value = rounded;
+    if (unitSelect.value === 'GM') { unitSelect.value = 'C'; }
+    currentInput();
+    var res = convertTemp(rounded, 'C');
+    showResult(res);
+    saveState(rounded, 'C');
+  }
+
+  /* ---- events ---- */
+  slider.addEventListener('input', function () { setC(parseFloat(slider.value), 'slider'); });
+  tempInput.addEventListener('input', runConverter);
+  unitSelect.addEventListener('change', runConverter);
+  gmPicker.addEventListener('change', runConverter);
+
+  /* ---- gas mark quick pills ---- */
+  var gasPills = $('gasPills');
+  GAS_TABLE.forEach(function (e) {
+    var b = document.createElement('button');
+    b.className = 'px-4 py-2 rounded-full font-extrabold text-sm bg-[#FFF3E2] border-2 border-[#EA580C]/40 text-[#92400E] hover:bg-[#EA580C] hover:text-white hover:border-[#EA580C] transition-colors';
+    b.textContent = 'Gas ' + e.gm;
+    b.addEventListener('click', function () {
+      var g = gasMarkToAll(e.gm);
+      $('gasDetail').classList.remove('hidden');
+      $('gasDetailTitle').textContent = 'Gas Mark ' + g.gm;
+      $('gasDetailBody').innerHTML = '<strong>' + g.c + '°C</strong> conventional · <strong>' + g.f + '°F</strong> · <strong>' + g.fanC + '°C</strong> fan-assisted · a <strong>' + g.desc.toLowerCase() + '</strong> oven.';
+      unitSelect.value = 'GM'; gmPicker.value = e.gm; runConverter();
+      document.querySelector('main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    gasPills.appendChild(b);
+  });
+
+  /* ---- describe-my-oven pills ---- */
+  var descPills = $('descPills');
+  DESC_TABLE.forEach(function (d) {
+    var b = document.createElement('button');
+    b.className = 'px-4 py-2 rounded-full font-extrabold text-sm bg-white/15 border-2 border-white/40 text-white hover:bg-white hover:text-[#92400E] transition-colors';
+    b.textContent = d.term;
+    b.addEventListener('click', function () {
+      var r = descLookup(d.term);
+      $('descDetail').classList.remove('hidden');
+      $('descDetailTitle').textContent = '“' + r.term + '”';
+      $('descDetailBody').innerHTML = 'Set your oven to <strong>' + r.c + '°C</strong> conventional (' + r.f + '°F / Gas Mark ' + r.gm + '), or <strong>' + r.fanC + '°C</strong> in a fan-assisted oven.';
+      setC(r.c, 'desc');
+    });
+    descPills.appendChild(b);
+  });
+
+  /* ---- dish presets ---- */
+  var grid = $('presetGrid');
+  PRESETS.forEach(function (p) {
+    var all = presetToAll(p.name);
+    var card = document.createElement('button');
+    card.className = 'text-left bg-white rounded-2xl border-2 border-[#EA580C]/25 p-4 shadow-sm hover:shadow-lg hover:border-[#EA580C] hover:-translate-y-0.5 transition-all';
+    card.innerHTML = '<div class="text-3xl mb-1">' + p.emoji + '</div>' +
+      '<div class="font-extrabold text-[#92400E] leading-tight">' + p.name + '</div>' +
+      '<div class="mt-1 text-sm font-bold text-[#EA580C]">' + all.c + '°C · ' + Math.round(all.f) + '°F · Gas ' + all.gm + '</div>' +
+      '<div class="text-xs text-[#7c2d12]/70 mt-0.5">Fan ' + all.fanC + '°C</div>';
+    card.setAttribute('aria-label', 'Load ' + p.name + ' preset: ' + all.c + ' degrees Celsius');
+    card.addEventListener('click', function () {
+      unitSelect.value = 'C'; tempInput.value = all.c;
+      setC(all.c, 'preset');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    grid.appendChild(card);
+  });
+
+  /* ---- persist last setting ---- */
+  function saveState(v, u) {
+    try { localStorage.setItem('ovenmark-last', JSON.stringify({ v: v, u: u })); } catch (e) {}
+  }
+  function restoreState() {
+    try {
+      var s = JSON.parse(localStorage.getItem('ovenmark-last') || 'null');
+      if (s && s.u) {
+        unitSelect.value = ['C', 'F', 'GM', 'FAN'].indexOf(s.u) >= 0 ? s.u : 'C';
+        if (s.u === 'GM' && parseGasMark(s.v)) gmPicker.value = parseGasMark(s.v);
+        else tempInput.value = s.v;
+      }
+    } catch (e) {}
+  }
+
+  restoreState();
+  runConverter();
+  paintReadout(parseFloat(slider.value));
+})();
+</script>
+</body>
+</html>
